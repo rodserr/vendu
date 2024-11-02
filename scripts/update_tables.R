@@ -63,7 +63,7 @@ posicion <- maquinas_list %>%
       httr2::request() %>% 
       httr2::req_auth_bearer_token(.esgaman_token) %>% 
       httr2::req_perform() %>% 
-      resp_body_json(.x) %>%
+      resp_body_json() %>%
       pluck('posicion') %>% 
       clean_response(.fecha_consulta = fecha_consulta_global)
   ) %>% 
