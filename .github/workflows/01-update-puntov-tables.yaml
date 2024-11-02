@@ -9,8 +9,9 @@ jobs:
   run-r-script:
     runs-on: ubuntu-latest # use Ubuntu
     env:
-      # The GitHub token will be available 
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }} 
+      ESGAMAN_MAIL: ${{ secrets.ESGAMAN_MAIL }}
+      ESGAMAN_PWD: ${{ secrets.ESGAMAN_PWD }}
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       # imports an action from another repository, 
       # that enables the machine
