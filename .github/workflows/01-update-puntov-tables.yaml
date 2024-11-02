@@ -11,6 +11,7 @@ jobs:
     env:
       ESGAMAN_MAIL: ${{ secrets.ESGAMAN_MAIL }}
       ESGAMAN_PWD: ${{ secrets.ESGAMAN_PWD }}
+      BIGQUERY_ENCRYPTED_KEY: ${{ secrets.BIGQUERY_ENCRYPTED_KEY }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
       # imports an action from another repository, 

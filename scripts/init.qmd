@@ -19,6 +19,19 @@ fecha_consulta_global <- Sys.time()
 maquinas_list <- list(GVRC004_VENDU1 = 'GVRC004_VENDU1', GVRC004_VENDU2 = 'GVRC004_VENDU2')
 ```
 
+### Encrypt BigQuery SA Key
+```{r encryption}
+# Generate secret key and assign to BIGQUERY_ENCRYPTED_KEY in .Renviron
+.bq_key <- gargle::secret_make_key()
+
+# Generate encrypted key
+gargle::secret_encrypt_json(
+  json = here(".secrets/vendu-tech-general.json"),
+  path = here("inst/secrets/vendu-tech-general-encrypted.json"),
+  key = "BIGQUERY_ENCRYPTED_KEY"
+)
+```
+
 ### Crear usuario (Solo una vez)
 
 ```{r get_token, eval = FALSE}

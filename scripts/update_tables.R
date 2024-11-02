@@ -5,8 +5,15 @@ library(httr2)
 library(purrr)
 source('scripts/helpers.R')
 
+# Decrypt BQ key and authenticate
+bigrquery::bq_auth(
+  path = gargle::secret_decrypt_json(
+    'inst/secrets/vendu-tech-general-encrypted.json',
+    key = 'BIGQUERY_ENCRYPTED_KEY'
+  )
+)
+
 # Set configs
-bigrquery::bq_auth(path = here('.secrets/vendu-tech-general.json'))
 maquinas_list <- list(GVRC004_VENDU1 = 'GVRC004_VENDU1', GVRC004_VENDU2 = 'GVRC004_VENDU2')
 fecha_consulta_global <- Sys.time()
 hoy <- Sys.Date()
