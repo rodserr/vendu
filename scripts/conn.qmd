@@ -1,0 +1,85 @@
+---
+title: "Sandbox connection"
+format: html
+---
+
+```{r libraries}
+library(dplyr)
+library(httr2)
+library(purrr)
+library(bigrquery)
+library(here)
+source('scripts/helpers.R')
+here::i_am('scripts/conn.qmd')
+```
+
+```{r auth}
+bigrquery::bq_auth(path = here('.secrets/vendu-tech-general.json'))
+fecha_consulta_global <- Sys.time()
+maquinas_list <- list(GVRC004_VENDU1 = 'GVRC004_VENDU1', GVRC004_VENDU2 = 'GVRC004_VENDU2')
+```
+
+### Crear usuario (Solo una vez)
+
+```{r get_token, eval = FALSE}
+.esgaman_token <- get_token(Sys.getenv('ESGAMAN_MAIL'), Sys.getenv('ESGAMAN_PWD'))
+```
+
+### Obtener ventas
+
+```{r get_ventas}
+ventas_resp <- maquinas_list %>% 
+  map(~get_ventas(.x, .esgaman_token, '2024-11-01', '2024-11-01'))
+
+ventas <- ventas_resp %>% 
+  map(
+    ~resp_body_json(.x) %>%
+      pluck('ventas', 1) %>% 
+      clean_response(fecha_consulta_global)
+  ) %>% 
+  list_rbind(names_to = 'id_maquina')
+
+ventas %>% 
+  write_vendu_table(
+    table = 'odsSales',
+    write_disposition = 'WRITE_APPEND'
+  )
+```
+
+### Obtener Existencia en Almacen
+
+```{r get_almacen}
+almacen_resp <- httr2::request('https://gamantoken.esgaman.com/public/api/get_almacen') %>% 
+  httr2::req_auth_bearer_token(.esgaman_token) %>% 
+  httr2::req_perform()
+
+almacen <- almacen_resp %>% 
+  httr2::resp_body_json() %>% 
+  pluck('producto') %>% 
+  clean_response(fecha_consulta_global)
+
+almacen %>% write_vendu_table(table = 'odsStore')
+```
+
+```{r get_posicion}
+posicion_resp <- maquinas_list %>% 
+  map(
+    ~glue::glue('https://gamantoken.esgaman.com/public/api/{.x}/get_posicion') %>% 
+      httr2::request() %>% 
+      httr2::req_auth_bearer_token(.esgaman_token) %>% 
+      httr2::req_perform()
+  )
+
+posicion <- posicion_resp %>% 
+  map(
+    ~resp_body_json(.x) %>%
+      pluck('posicion') %>% 
+      clean_response(fecha_consulta_global)
+  ) %>% 
+  list_rbind(names_to = 'id_maquina')
+
+posicion %>% write_vendu_table(table = 'odsPosition')
+```
+
+
+
