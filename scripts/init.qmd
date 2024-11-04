@@ -15,7 +15,11 @@ here::i_am('scripts/conn.qmd')
 
 ```{r auth}
 bigrquery::bq_auth(path = here('.secrets/vendu-tech-general.json'))
-fecha_consulta_global <- Sys.time()
+current_time_locale <- Sys.time()
+# Cambiar timezone a Caracas
+current_time_locale <- lubridate::with_tz(current_time_locale, 'America/Caracas')
+hoy <- lubridate::floor_date(current_time_locale, 'day') %>% as_date()
+
 maquinas_list <- list(GVRC004_VENDU1 = 'GVRC004_VENDU1', GVRC004_VENDU2 = 'GVRC004_VENDU2')
 ```
 
@@ -42,13 +46,13 @@ gargle::secret_encrypt_json(
 
 ```{r get_ventas}
 ventas_resp <- maquinas_list %>% 
-  map(~get_ventas(.x, .esgaman_token, '2024-11-01', '2024-11-01'))
+  map(~get_ventas(.x, .esgaman_token, '2024-11-02', '2024-11-03'))
 
 ventas <- ventas_resp %>% 
   map(
     ~resp_body_json(.x) %>%
       pluck('ventas', 1) %>% 
-      clean_response(fecha_consulta_global)
+      clean_response(current_time_locale)
   ) %>% 
   list_rbind(names_to = 'id_maquina')
 
@@ -69,7 +73,7 @@ almacen_resp <- httr2::request('https://gamantoken.esgaman.com/public/api/get_al
 almacen <- almacen_resp %>% 
   httr2::resp_body_json() %>% 
   pluck('producto') %>% 
-  clean_response(fecha_consulta_global)
+  clean_response(current_time_locale)
 
 almacen %>% write_vendu_table(table = 'odsStore')
 ```
@@ -87,7 +91,7 @@ posicion <- posicion_resp %>%
   map(
     ~resp_body_json(.x) %>%
       pluck('posicion') %>% 
-      clean_response(fecha_consulta_global)
+      clean_response(current_time_locale)
   ) %>% 
   list_rbind(names_to = 'id_maquina')
 
