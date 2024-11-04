@@ -76,3 +76,33 @@ write_vendu_table <- function(
       fields = bigrquery::as_bq_fields(data)
     )
 }
+
+
+# Write Sales conditional
+write_sales_condition <- function(df, current_hour){
+  
+  # Si son las 11pm entonces APPEND a tabla historica y limpiar tabla diaria 
+  if(lubridate::hour(current_hour) == 23){
+    df %>% 
+      write_vendu_table(
+        table = 'odsSales', 
+        write_disposition = 'WRITE_APPEND'
+      )
+    
+    current_hour %>% 
+      filter(is.na(id)) %>%
+      write_vendu_table(
+        table = 'odsSalesCurrentDay', 
+        write_disposition = 'WRITE_TRUNCATE'
+      )
+    
+    
+  } else{
+    current_hour %>% 
+      write_vendu_table(
+        table = 'odsSalesCurrentDay', 
+        write_disposition = 'WRITE_TRUNCATE'
+      )
+    
+  }
+}

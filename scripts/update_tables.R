@@ -3,6 +3,7 @@ library(dplyr)
 library(bigrquery)
 library(httr2)
 library(purrr)
+library(lubridate)
 source('scripts/helpers.R')
 
 # Decrypt BQ key and authenticate
@@ -15,8 +16,10 @@ bigrquery::bq_auth(
 
 # Set configs
 maquinas_list <- list(GVRC004_VENDU1 = 'GVRC004_VENDU1', GVRC004_VENDU2 = 'GVRC004_VENDU2')
-fecha_consulta_global <- Sys.time()
-hoy <- Sys.Date()
+current_time_locale <- Sys.time()
+# Cambiar timezone a Caracas
+current_time_locale <- lubridate::with_tz(current_time_locale, 'America/Caracas')
+hoy <- lubridate::floor_date(current_time_locale, 'day') %>% as_date()
 
 # Get Token
 .esgaman_token <- get_token(Sys.getenv('ESGAMAN_MAIL'), Sys.getenv('ESGAMAN_PWD'))
@@ -30,15 +33,11 @@ ventas <- ventas_resp %>%
   map(
     ~resp_body_json(.x) %>%
       pluck('ventas', 1) %>% 
-      clean_response(.fecha_consulta = fecha_consulta_global)
+      clean_response(.fecha_consulta = current_time_locale)
   ) %>% 
   list_rbind(names_to = 'id_maquina')
 
-ventas %>% 
-  write_vendu_table(
-    table = 'odsSalesCurrentDay', 
-    write_disposition = 'WRITE_TRUNCATE'
-  )
+ventas %>% write_sales_condition(current_time_locale)
 
 # GET stores
 cat('Starting store ETL\n')
@@ -47,7 +46,7 @@ almacen <- httr2::request('https://gamantoken.esgaman.com/public/api/get_almacen
   httr2::req_perform() %>% 
   httr2::resp_body_json() %>% 
   pluck('producto') %>% 
-  clean_response(.fecha_consulta = fecha_consulta_global)
+  clean_response(.fecha_consulta = current_time_locale)
 
 almacen %>%
   write_vendu_table(
@@ -65,7 +64,7 @@ posicion <- maquinas_list %>%
       httr2::req_perform() %>% 
       resp_body_json() %>%
       pluck('posicion') %>% 
-      clean_response(.fecha_consulta = fecha_consulta_global)
+      clean_response(.fecha_consulta = current_time_locale)
   ) %>% 
   list_rbind(names_to = 'id_maquina')
 
