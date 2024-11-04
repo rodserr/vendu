@@ -83,12 +83,14 @@ write_sales_condition <- function(df, current_hour){
   
   # Si son las 11pm entonces APPEND a tabla historica y limpiar tabla diaria 
   if(lubridate::hour(current_hour) == 23){
+    cat('Appending to odsSales\n')
     df %>% 
       write_vendu_table(
         table = 'odsSales', 
         write_disposition = 'WRITE_APPEND'
       )
     
+    cat('Dropping odsSalesCurrentDay\n')
     df %>% 
       filter(is.na(id)) %>%
       write_vendu_table(
@@ -98,6 +100,7 @@ write_sales_condition <- function(df, current_hour){
     
     
   } else{
+    
     df %>% 
       write_vendu_table(
         table = 'odsSalesCurrentDay', 
