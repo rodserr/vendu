@@ -89,7 +89,7 @@ write_sales_condition <- function(df, current_hour){
         write_disposition = 'WRITE_APPEND'
       )
     
-    current_hour %>% 
+    df %>% 
       filter(is.na(id)) %>%
       write_vendu_table(
         table = 'odsSalesCurrentDay', 
@@ -98,7 +98,7 @@ write_sales_condition <- function(df, current_hour){
     
     
   } else{
-    current_hour %>% 
+    df %>% 
       write_vendu_table(
         table = 'odsSalesCurrentDay', 
         write_disposition = 'WRITE_TRUNCATE'
