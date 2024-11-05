@@ -38,7 +38,8 @@ get_ventas <- function(id_maq, token, desde, hasta, tipo_tran = 'TODO'){
 clean_response <- function(l, .fecha_consulta){
   .numeric_fields <- c('cantidad', 'cantidad_divisas', 'tasa', 'costo_unitario', 'precio_de_venta',
                        'precio_venta_divisas', 'precio_venta_bs', 'costo')
-  .integer_fields <- c('id', 'pos', 'id_producto', 'existencia', 'minimo', 'maximo', 'id_venta', 'posicion')
+  .integer_fields <- c('id', 'pos', 'id_producto', 'existencia', 'minimo', 'maximo', 
+                       'minimo_maq', 'maximo_maq', 'id_venta', 'posicion')
   
   l %>% 
     map(~.x %>% discard(is.null) %>% as_tibble) %>% 
