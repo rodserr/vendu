@@ -8,9 +8,10 @@ library(dplyr)
 library(httr2)
 library(purrr)
 library(bigrquery)
+library(lubridate)
 library(here)
-source('scripts/helpers.R')
-here::i_am('scripts/conn.qmd')
+source(here('scripts/helpers.R'))
+here::i_am('scripts/init.qmd')
 ```
 
 ```{r auth}
@@ -36,7 +37,7 @@ gargle::secret_encrypt_json(
 )
 ```
 
-### Crear usuario (Solo una vez)
+### Crear usuario
 
 ```{r get_token, eval = FALSE}
 .esgaman_token <- get_token(Sys.getenv('ESGAMAN_MAIL'), Sys.getenv('ESGAMAN_PWD'))
@@ -46,7 +47,9 @@ gargle::secret_encrypt_json(
 
 ```{r get_ventas}
 ventas_resp <- maquinas_list %>% 
-  map(~get_ventas(.x, .esgaman_token, '2024-11-02', '2024-11-03'))
+  map(~get_ventas(.x, .esgaman_token, '2024-11-10', '2024-11-10'))
+
+# xx <- get_ventas('GVRC004_VENDU2', .esgaman_token, '2024-11-11', '2024-11-11')
 
 ventas <- ventas_resp %>% 
   map(

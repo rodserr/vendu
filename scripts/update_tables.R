@@ -71,5 +71,5 @@ posicion <- maquinas_list %>%
 posicion %>%
   write_vendu_table(
     table = 'odsPosition',
-    write_disposition = 'WRITE_TRUNCATE'
+    write_disposition = 'WRITE_APPEND'
   )
