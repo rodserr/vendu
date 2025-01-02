@@ -15,7 +15,7 @@ bigrquery::bq_auth(
 )
 
 # Set configs
-maquinas_list <- list(GVRC004_VENDU1 = 'GVRC004_VENDU1', GVRC004_VENDU2 = 'GVRC004_VENDU2')
+maquinas_list <- list(GVRC004_VENDU='GVRC004_VENDU1', GVRC004_VENDU2='GVRC004_VENDU2', MERC1='MERC1')
 current_time_locale <- Sys.time()
 # Cambiar timezone a Caracas
 current_time_locale <- lubridate::with_tz(current_time_locale, 'America/Caracas')
