@@ -27,9 +27,15 @@ hoy <- lubridate::floor_date(current_time_locale, 'day') %>% as_date()
 # Get sales
 cat('Starting sales ETL\n')
 ventas_resp <- maquinas_list %>% 
-  map(~get_ventas(.x, .esgaman_token, hoy, hoy))
+  map(
+    possibly(
+      ~get_ventas(.x, .esgaman_token, hoy, hoy), 
+      list()
+    ) 
+  )
 
 ventas <- ventas_resp %>% 
+  discard(is_empty) %>% 
   map(
     ~resp_body_json(.x) %>%
       pluck('ventas', 1) %>% 
