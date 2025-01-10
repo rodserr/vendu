@@ -15,10 +15,7 @@ bigrquery::bq_auth(
 )
 
 # Set configs
-maquinas_list <- list(GVRC004_VENDU='GVRC004_VENDU1', GVRC004_VENDU2='GVRC004_VENDU2', MERC1='MERC1')
-current_time_locale <- Sys.time()
-# Cambiar timezone a Caracas
-current_time_locale <- lubridate::with_tz(current_time_locale, 'America/Caracas')
+current_time_locale <- lubridate::with_tz(Sys.time(), 'America/Caracas')
 hoy <- lubridate::floor_date(current_time_locale, 'day') %>% as_date()
 
 # Get Token
@@ -43,7 +40,12 @@ ventas <- ventas_resp %>%
   ) %>% 
   list_rbind(names_to = 'id_maquina')
 
-ventas %>% write_sales_condition(current_time_locale)
+if(nrow(ventas) > 0){
+  ventas %>% write_sales_condition(current_time_locale)
+} else{
+  cat('\nNo sales at run time\n')
+}
+
 
 # GET stores
 cat('Starting store ETL\n')

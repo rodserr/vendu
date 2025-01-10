@@ -1,3 +1,10 @@
+# Maquinas List
+maquinas_list <- list(
+  GVRC004_VENDU='GVRC004_VENDU1', 
+  GVRC004_VENDU2='GVRC004_VENDU2', 
+  MERC1='MERC1'
+)
+
 # Renew Token
 get_token <- function(email, pwd){
   
@@ -16,7 +23,6 @@ get_token <- function(email, pwd){
     pluck('token')
   
 }
-
 
 # GET ventas
 get_ventas <- function(id_maq, token, desde, hasta, tipo_tran = 'TODO'){
@@ -109,4 +115,52 @@ write_sales_condition <- function(df, current_hour){
       )
     
   }
+}
+
+# GET today sales from bigquery
+bq_get_today_sales <- function(){
+  query <- "
+  SELECT 
+  id_maquina,
+  count(*) as ventas
+  FROM `vendu-tech.puntov.odsSalesCurrentDay` 
+  group by 1
+  "
+  
+  bigrquery::bq_project_query(
+    x = 'vendu-tech',
+    query = query
+  ) %>% 
+    bigrquery::bq_table_download()
+  
+}
+
+# Compose Email alert
+compose_noSales_alert_email <- function(hour){
+  
+  img_file <- add_image(
+    file = "inst/styles/logo_vendunegro-01.png",
+    width = 100,
+    align = 'center'
+  )
+  
+  maq_fmt <- glue::glue('- **`{maq_vector}`**') %>% paste0(collapse = '\n')
+  # print(maq_fmt)
+  body_text <-
+    glue::glue(
+      "
+      
+      ## 🚨 Alerta de Ventas 
+      
+      A las `{hour}` de hoy, las máquinas:
+      
+      **{maq_fmt}**
+      
+      No han vendido ningún producto. 
+      Quizás quieras revisar que estén operando correctamente.
+      "   
+    )
+  
+  blastula::compose_email(body = md(c(img_file, body_text)))
+  
 }

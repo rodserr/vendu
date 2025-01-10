@@ -1,5 +1,5 @@
 ---
-title: "Sandbox connection"
+title: "Sandbox Codes"
 format: html
 ---
 
@@ -24,7 +24,9 @@ hoy <- lubridate::floor_date(current_time_locale, 'day') %>% as_date()
 maquinas_list <- list(GVRC004_VENDU1 = 'GVRC004_VENDU1', GVRC004_VENDU2 = 'GVRC004_VENDU2')
 ```
 
-### Encrypt BigQuery SA Key
+## Encrypt BigQuery SA Key
+
+Encrypt SA to use in Github Actions
 ```{r encryption}
 # Generate secret key and assign to BIGQUERY_ENCRYPTED_KEY in .Renviron
 .bq_key <- gargle::secret_make_key()
@@ -37,69 +39,27 @@ gargle::secret_encrypt_json(
 )
 ```
 
-### Crear usuario
+## Create SMTP Credentials
 
-```{r get_token, eval = FALSE}
-.esgaman_token <- get_token(Sys.getenv('ESGAMAN_MAIL'), Sys.getenv('ESGAMAN_PWD'))
-```
+```{r}
+library(blastula)
 
-### Obtener ventas
+email_creds <- blastula::creds_envvar(
+  user = Sys.getenv('GMAIL_ACCOUNT'),
+  pass_envvar = 'GOOGLE_APP_PASSWORD',
+  provider = 'gmail'
+)
 
-```{r get_ventas}
-ventas_resp <- maquinas_list %>% 
-  map(~get_ventas(.x, .esgaman_token, '2024-11-10', '2024-11-10'))
+test_message <- prepare_test_message()
 
-# xx <- get_ventas('GVRC004_VENDU2', .esgaman_token, '2024-11-11', '2024-11-11')
-
-ventas <- ventas_resp %>% 
-  map(
-    ~resp_body_json(.x) %>%
-      pluck('ventas', 1) %>% 
-      clean_response(current_time_locale)
-  ) %>% 
-  list_rbind(names_to = 'id_maquina')
-
-ventas %>% 
-  write_vendu_table(
-    table = 'odsSales',
-    write_disposition = 'WRITE_APPEND'
-  )
-```
-
-### Obtener Existencia en Almacen
-
-```{r get_almacen}
-almacen_resp <- httr2::request('https://gamantoken.esgaman.com/public/api/get_almacen') %>% 
-  httr2::req_auth_bearer_token(.esgaman_token) %>% 
-  httr2::req_perform()
-
-almacen <- almacen_resp %>% 
-  httr2::resp_body_json() %>% 
-  pluck('producto') %>% 
-  clean_response(current_time_locale)
-
-almacen %>% write_vendu_table(table = 'odsStore')
-```
-
-```{r get_posicion}
-posicion_resp <- maquinas_list %>% 
-  map(
-    ~glue::glue('https://gamantoken.esgaman.com/public/api/{.x}/get_posicion') %>% 
-      httr2::request() %>% 
-      httr2::req_auth_bearer_token(.esgaman_token) %>% 
-      httr2::req_perform()
+test_message %>% 
+  smtp_send(
+    from = Sys.getenv('GMAIL_ACCOUNT'),
+    to = 'rodrigoserranom8@gmail.com',
+    subject = 'Testing smtp send',
+    credentials = email_creds
   )
 
-posicion <- posicion_resp %>% 
-  map(
-    ~resp_body_json(.x) %>%
-      pluck('posicion') %>% 
-      clean_response(current_time_locale)
-  ) %>% 
-  list_rbind(names_to = 'id_maquina')
 
-posicion %>% write_vendu_table(table = 'odsPosition')
 ```
-
-
 
