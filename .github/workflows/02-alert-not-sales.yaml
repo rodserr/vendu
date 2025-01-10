@@ -11,8 +11,8 @@ jobs:
     env:
       BIGQUERY_ENCRYPTED_KEY: ${{ secrets.BIGQUERY_ENCRYPTED_KEY }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      GOOGLE_APP_PASSWORD: {{secrets.GOOGLE_APP_PASSWORD}}
-      GMAIL_ACCOUNT: {{secrets.GMAIL_ACCOUNT}}
+      GOOGLE_APP_PASSWORD: ${{secrets.GOOGLE_APP_PASSWORD}}
+      GMAIL_ACCOUNT: ${{secrets.GMAIL_ACCOUNT}}
 
     steps:
       - uses: actions/checkout@v4
