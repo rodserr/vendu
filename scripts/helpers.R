@@ -136,7 +136,7 @@ bq_get_today_sales <- function(){
 }
 
 # Compose Email alert
-compose_noSales_alert_email <- function(hour){
+compose_noSales_alert_email <- function(maq_vector, hour){
   
   img_file <- add_image(
     file = "inst/styles/logo_vendunegro-01.png",
@@ -154,7 +154,7 @@ compose_noSales_alert_email <- function(hour){
       
       A las `{hour}` de hoy, las máquinas:
       
-      **{maq_fmt}**
+      {maq_fmt}
       
       No han vendido ningún producto. 
       Quizás quieras revisar que estén operando correctamente.
