@@ -13,7 +13,6 @@ bigrquery::bq_auth(
 
 # Caracas Time
 current_time_locale <- lubridate::with_tz(Sys.time(), 'America/Caracas')
-
 current_hour <- format(current_time_locale, '%I%p') %>% tolower()
 
 # GET  Today Sales
@@ -29,11 +28,7 @@ if(nrow(today_sales) == length(maquinas_list) ){
   cat('\nAl menos una maquina no cumple los criterios, enviando Email\n')
   
   # Compose Email
-  maquinas <- names(maquinas_list)
-  maquinas_w_sales <- today_sales$id_maquina
-  maquinas_wo_sales <- maquinas[!maquinas %in% maquinas_w_sales]
-  
-  alert_email <- compose_noSales_alert_email(maquinas_wo_sales, current_hour)
+  alert_email <- compose_noSales_alert_email(today_sales, maquinas_list, current_hour)
   
   # Create Credentials
   email_creds <- blastula::creds_envvar(
@@ -46,8 +41,9 @@ if(nrow(today_sales) == length(maquinas_list) ){
   alert_email %>% 
     smtp_send(
       from = Sys.getenv('GMAIL_ACCOUNT'),
-      to = 'rodrigoserranom8@gmail.com',
-      subject = 'Vendu Alert: Maquinas sin ventas a la hora actual',
+      to = c('carlos@tuvendu.com', 'miguel@tuvendu.com', 'alessandro@tuvendu.com'),
+      bcc = 'rodrigoserranom8@gmail.com',
+      subject = 'Vendu Alert: Máquinas sin ventas',
       credentials = email_creds
     )
   

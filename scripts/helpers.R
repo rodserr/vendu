@@ -122,7 +122,8 @@ bq_get_today_sales <- function(){
   query <- "
   SELECT 
   id_maquina,
-  count(*) as ventas
+  count(*) as ventas_n,
+  sum(precio_venta_divisas) as ventas_usd,
   FROM `vendu-tech.puntov.odsSalesCurrentDay` 
   group by 1
   "
@@ -136,21 +137,41 @@ bq_get_today_sales <- function(){
 }
 
 # Compose Email alert
-compose_noSales_alert_email <- function(maq_vector, hour){
+compose_noSales_alert_email <- function(sales, current_machines, hour){
   
+  # Identify Machines without sales
+  maquinas <- names(current_machines)
+  maquinas_w_sales <- sales$id_maquina
+  maquinas_wo_sales <- maquinas[!maquinas %in% maquinas_w_sales]
+  
+  # Build sales resume
+  if(nrow(sales) > 0){
+    sales_vector <- sales %>% 
+      mutate(
+        sales_ = glue::glue('- **`{id_maquina}`**: ${round(ventas_usd, 2)}')
+      ) %>% 
+      pull(sales_) %>% 
+      paste0(collapse = '\n')
+    
+  }
+  else{
+    sales_vector <- 'No hay ventas registradas'
+  }
+  
+  # Add Vendu Logo
   img_file <- add_image(
     file = "inst/styles/logo_vendunegro-01.png",
-    width = 100,
+    width = 150,
     align = 'center'
   )
   
-  maq_fmt <- glue::glue('- **`{maq_vector}`**') %>% paste0(collapse = '\n')
+  maq_fmt <- glue::glue('- **`{maquinas_wo_sales}`**') %>% paste0(collapse = '\n')
   # print(maq_fmt)
   body_text <-
     glue::glue(
       "
       
-      ## 🚨 Alerta de Ventas 
+      ## 🚨  Alerta de Ventas 
       
       A las `{hour}` de hoy, las máquinas:
       
@@ -158,6 +179,9 @@ compose_noSales_alert_email <- function(maq_vector, hour){
       
       No han vendido ningún producto. 
       Quizás quieras revisar que estén operando correctamente.
+      
+      #### Resumen de Ventas del Día
+      {sales_vector}
       "   
     )
   
