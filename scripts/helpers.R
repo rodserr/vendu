@@ -1,6 +1,6 @@
 # Maquinas List
 maquinas_list <- list(
-  GVRC004_VENDU='GVRC004_VENDU1', 
+  GVRC004_VENDU1='GVRC004_VENDU1', 
   GVRC004_VENDU2='GVRC004_VENDU2', 
   MERC1='MERC1'
 )
