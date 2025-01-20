@@ -1,7 +1,7 @@
 on:
   schedule: 
-    - cron:  "50 3,13,15,22 * * *" 
-    - cron:  "20 19 * * *" 
+    - cron:  "50 3,13,15,22 * * *" # 12pm 10am 12am 7pm
+    - cron:  "20 18,19 * * *" # 2.20pm 3.20pm
   workflow_dispatch:
   
 name: update-puntov-tables
