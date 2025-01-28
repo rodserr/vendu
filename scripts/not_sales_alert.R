@@ -38,13 +38,32 @@ if(nrow(today_sales) == length(maquinas_list) ){
   )
   
   # Send email
-  alert_email %>% 
-    smtp_send(
-      from = Sys.getenv('GMAIL_ACCOUNT'),
-      to = c('carlos@tuvendu.com', 'miguel@tuvendu.com', 'alessandro@tuvendu.com'),
-      bcc = 'rodrigoserranom8@gmail.com',
-      subject = 'Vendu Alert: Máquinas sin ventas',
-      credentials = email_creds
-    )
+  .to <- c('carlos@tuvendu.com', 'miguel@tuvendu.com', 'alessandro@tuvendu.com')
+  tryCatch({
+    alert_email %>% 
+      smtp_send(
+        from = Sys.getenv('GMAIL_ACCOUNT'),
+        to = .to,
+        bcc = 'rodrigoserranom8@gmail.com',
+        subject = 'Vendu Alert: Máquinas sin ventas',
+        credentials = email_creds
+      )
+    
+  },
+  error = function(e){
+    
+    cat('Error enviando email, intentando de nuevo\n')
+    Sys.sleep(5)
+    alert_email %>% 
+      smtp_send(
+        from = Sys.getenv('GMAIL_ACCOUNT'),
+        to = .to,
+        bcc = 'rodrigoserranom8@gmail.com',
+        subject = 'Vendu Alert: Máquinas sin ventas',
+        credentials = email_creds
+      )
+    
+  })
+  
   
 }
