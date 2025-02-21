@@ -4,14 +4,12 @@ on:
     - cron:  "20 18,19 * * *" # 2.20pm 3.20pm
   workflow_dispatch:
   
-name: update-puntov-tables
+name: update-epay-tables
 
 jobs:
   run-r-script:
     runs-on: ubuntu-latest # use Ubuntu
     env:
-      ESGAMAN_MAIL: ${{ secrets.ESGAMAN_MAIL }}
-      ESGAMAN_PWD: ${{ secrets.ESGAMAN_PWD }}
       BIGQUERY_ENCRYPTED_KEY: ${{ secrets.BIGQUERY_ENCRYPTED_KEY }}
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     steps:
@@ -23,4 +21,4 @@ jobs:
 
       - name: Execute Script
         run: |
-          Rscript "scripts/update_puntov.R"
+          Rscript "scripts/update_epay.R"

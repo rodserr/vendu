@@ -1,51 +1,47 @@
+################ GLOBAL FUNCTIONS ################
+
 # Maquinas List
 maquinas_list <- list(
-  GVRC004_VENDU1='GVRC004_VENDU1', 
-  GVRC004_VENDU2='GVRC004_VENDU2', 
-  MERC1='MERC1'
+  puntov = list(
+    GVRC004_VENDU1='GVRC004_VENDU1', 
+    GVRC004_VENDU2='GVRC004_VENDU2', 
+    MERC1='MERC1'
+  ),
+  epay = list(
+    netuno = '6edeae11-a06d-4dd7-b766-75257b55a1d8',
+    oficentro = '52b69d4d-864f-4641-8be6-80a6438cb34e'
+  )
 )
 
-# Renew Token
-get_token <- function(email, pwd){
-  
-  cat('Rewnewing token\n')
-  
-  token_resp <- httr2::request('https://gamantoken.esgaman.com/public/api/login') %>% 
-    httr2::req_method('POST') %>%
-    httr2::req_url_query(
-      correo = email,
-      password = pwd,
-    ) %>% 
-    httr2::req_perform()
-  
-  token_resp %>%
-    httr2::resp_body_json() %>% 
-    pluck('token')
-  
-}
-
-# GET ventas
-get_ventas <- function(id_maq, token, desde, hasta, tipo_tran = 'TODO'){
-  
-  glue::glue('https://gamantoken.esgaman.com/public/api/{id_maq}/venta_formato_excel') %>% 
-    httr2::request() %>%
-    httr2::req_auth_bearer_token(token) %>%
-    httr2::req_method('POST') %>%
-    httr2::req_url_query(
-      fecha_desde = desde,
-      fecha_hasta = hasta,
-      tipo_transaccion = tipo_tran
-    ) %>%
-    httr2::req_perform()
-
-}
+field_map <- list(
+  puntov = list(
+    numeric = c(
+      'cantidad', 'cantidad_divisas', 'tasa', 'costo_unitario', 'precio_de_venta','precio_venta_divisas', 
+      'precio_venta_bs', 'costo'
+    ),
+    integer = c(
+      'id', 'pos', 'id_producto', 'existencia', 'minimo', 'maximo', 'minimo_maq', 'maximo_maq', 'id_venta', 
+      'posicion'
+    )
+  ),
+  epay = list(
+    numeric = c(
+      'usd', 'precio', 'monto'
+    ),
+    integer = c(
+      'rowid', 'activo', 'cantidad', 'minimo', 'maximo', 'producto', 'medio', 'tid'
+    )
+    
+  )
+)
 
 # Bind response and formatting columns 
-clean_response <- function(l, .fecha_consulta){
-  .numeric_fields <- c('cantidad', 'cantidad_divisas', 'tasa', 'costo_unitario', 'precio_de_venta',
-                       'precio_venta_divisas', 'precio_venta_bs', 'costo')
-  .integer_fields <- c('id', 'pos', 'id_producto', 'existencia', 'minimo', 'maximo', 
-                       'minimo_maq', 'maximo_maq', 'id_venta', 'posicion')
+clean_response <- function(
+    l,
+    .fecha_consulta,
+    .numeric_fields = puntov_field_map$numeric,
+    .integer_fields = puntov_field_map$integer
+){
   
   l %>% 
     map(~.x %>% discard(is.null) %>% as_tibble) %>% 
@@ -86,13 +82,14 @@ write_vendu_table <- function(
 
 
 # Write Sales conditional
-write_sales_condition <- function(df, current_hour){
+write_sales_condition <- function(df, current_hour, dataset = 'puntov'){
   
   # Si son las 11pm entonces APPEND a tabla historica y limpiar tabla diaria 
   if(lubridate::hour(current_hour) == 23){
     cat('Appending to odsSales\n')
     df %>% 
       write_vendu_table(
+        dataset = dataset,
         table = 'odsSales', 
         write_disposition = 'WRITE_APPEND'
       )
@@ -101,6 +98,7 @@ write_sales_condition <- function(df, current_hour){
     df %>% 
       filter(is.na(id)) %>%
       write_vendu_table(
+        dataset = dataset,
         table = 'odsSalesCurrentDay', 
         write_disposition = 'WRITE_TRUNCATE'
       )
@@ -110,12 +108,69 @@ write_sales_condition <- function(df, current_hour){
     
     df %>% 
       write_vendu_table(
+        dataset = dataset,
         table = 'odsSalesCurrentDay', 
         write_disposition = 'WRITE_TRUNCATE'
       )
     
   }
 }
+
+################ PUNTO V ################
+
+# Renew Token
+get_token <- function(email, pwd){
+  
+  cat('Rewnewing token\n')
+  
+  token_resp <- httr2::request('https://gamantoken.esgaman.com/public/api/login') %>% 
+    httr2::req_method('POST') %>%
+    httr2::req_url_query(
+      correo = email,
+      password = pwd,
+    ) %>% 
+    httr2::req_perform()
+  
+  token_resp %>%
+    httr2::resp_body_json() %>% 
+    pluck('token')
+  
+}
+
+# GET ventas
+get_ventas_puntov <- function(id_maq, token, desde, hasta, tipo_tran = 'TODO'){
+  
+  glue::glue('https://gamantoken.esgaman.com/public/api/{id_maq}/venta_formato_excel') %>% 
+    httr2::request() %>%
+    httr2::req_auth_bearer_token(token) %>%
+    httr2::req_method('POST') %>%
+    httr2::req_url_query(
+      fecha_desde = desde,
+      fecha_hasta = hasta,
+      tipo_transaccion = tipo_tran
+    ) %>%
+    httr2::req_perform()
+
+}
+
+################ EPAY ################
+get_ventas_epay <- function(id_maq, endpoint = 'venta', day, month, year){
+  
+  # endpoint: 'pago' o 'venta'
+  
+  glue::glue('https://epay.uno/api/?e={endpoint}') %>%
+    httr2::request() %>%
+    httr2::req_url_query(
+      id = id_maq,
+      m = month,
+      a = year,
+      d = day
+    ) %>%
+    httr2::req_perform()
+  
+}
+
+################ EMAIL ALERT ################
 
 # GET today sales from bigquery
 bq_get_today_sales <- function(){
