@@ -41,7 +41,7 @@ ventas <- ventas_resp %>%
       )
   ) %>% 
   list_rbind(names_to = 'id_maquina') %>% 
-  filter(lubridate::floor_date(fecha, 'day') == today)
+  dplyr::filter(lubridate::floor_date(fecha, 'day') == today)
 
 if(nrow(ventas) > 0){
   ventas %>% 
