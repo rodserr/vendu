@@ -39,8 +39,8 @@ field_map <- list(
 clean_response <- function(
     l,
     .fecha_consulta,
-    .numeric_fields = puntov_field_map$numeric,
-    .integer_fields = puntov_field_map$integer
+    .numeric_fields = field_map$puntov$numeric,
+    .integer_fields = field_map$puntov$integer
 ){
   
   l %>% 
