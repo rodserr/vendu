@@ -154,7 +154,7 @@ get_ventas_puntov <- function(id_maq, token, desde, hasta, tipo_tran = 'TODO'){
 }
 
 ################ EPAY ################
-get_ventas_epay <- function(id_maq, endpoint = 'venta', day, month, year){
+get_ventas_epay <- function(id_maq, endpoint = 'venta', month, year){
   
   # endpoint: 'pago' o 'venta'
   
@@ -163,8 +163,7 @@ get_ventas_epay <- function(id_maq, endpoint = 'venta', day, month, year){
     httr2::req_url_query(
       id = id_maq,
       m = month,
-      a = year,
-      d = day
+      a = year
     ) %>%
     httr2::req_perform()
   
