@@ -15,11 +15,14 @@ bigrquery::bq_auth(
 current_time_locale <- lubridate::with_tz(Sys.time(), 'America/Caracas')
 current_hour <- format(current_time_locale, '%I%p') %>% tolower()
 
+# Maquinas
+maqs <- flatten(maquinas_list)
+
 # GET  Today Sales
 today_sales <- bq_get_today_sales()
 
 # Send Email if meet criteria
-if(nrow(today_sales) == length(maquinas_list) ){
+if(nrow(today_sales) == length(maqs) ){
   
   cat('\nTodas las maquinas han vendido al menos un producto hoy\n')
   
@@ -28,7 +31,7 @@ if(nrow(today_sales) == length(maquinas_list) ){
   cat('\nAl menos una maquina no cumple los criterios, enviando Email\n')
   
   # Compose Email
-  alert_email <- compose_noSales_alert_email(today_sales, maquinas_list, current_hour)
+  alert_email <- compose_noSales_alert_email(today_sales, maqs, current_hour)
   
   # Create Credentials
   email_creds <- blastula::creds_envvar(
