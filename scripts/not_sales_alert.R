@@ -1,6 +1,7 @@
 library(dplyr)
 library(bigrquery)
 library(blastula)
+library(purrr)
 source('scripts/helpers.R')
 
 # Decrypt BQ key and authenticate
