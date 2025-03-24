@@ -27,7 +27,7 @@ ventas_resp <- maquinas_list$epay %>%
     possibly(
       ~get_ventas_epay(.x, endpoint = 'venta', month, year), 
       list()
-    ) 
+    )
   )
 
 ventas <- ventas_resp %>% 

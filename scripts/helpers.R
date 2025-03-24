@@ -9,7 +9,10 @@ maquinas_list <- list(
   ),
   epay = list(
     netuno = '6edeae11-a06d-4dd7-b766-75257b55a1d8',
-    oficentro = '52b69d4d-864f-4641-8be6-80a6438cb34e'
+    oficentro = '52b69d4d-864f-4641-8be6-80a6438cb34e',
+    idet = 'a70e5131-3f79-4773-b064-681f5afd407b',
+    plaza = '7b5dac83-116b-43f2-b98a-706b5112b4c3',
+    venemer = '7f0a2baa-b739-4c0c-bddd-23bc8d10da94'
   )
 )
 
