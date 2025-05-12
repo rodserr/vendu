@@ -15,7 +15,7 @@ bigrquery::bq_auth(
 )
 
 # Set configs
-maquinas <- maquinas_list$puntov %>% set_names(maquinas_list$epay)
+maquinas <- maquinas_list$puntov %>% set_names(maquinas_list$puntov)
 current_time_locale <- lubridate::with_tz(Sys.time(), 'America/Caracas')
 today <- lubridate::floor_date(current_time_locale, 'day') %>% as_date()
 
