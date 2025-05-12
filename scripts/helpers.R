@@ -3,16 +3,21 @@
 # Maquinas List
 maquinas_list <- list(
   puntov = list(
-    GVRC004_VENDU1='GVRC004_VENDU1', 
-    GVRC004_VENDU2='GVRC004_VENDU2', 
-    MERC1='MERC1'
+    'GVRC004_VENDU1', 
+    'GVRC004_VENDU2', 
+    'MERC1'
   ),
   epay = list(
-    netuno = '6edeae11-a06d-4dd7-b766-75257b55a1d8',
-    oficentro = '52b69d4d-864f-4641-8be6-80a6438cb34e',
-    idet = 'a70e5131-3f79-4773-b064-681f5afd407b',
-    plaza = '7b5dac83-116b-43f2-b98a-706b5112b4c3',
-    venemer = '7f0a2baa-b739-4c0c-bddd-23bc8d10da94'
+    '6edeae11-a06d-4dd7-b766-75257b55a1d8', # netuno
+    '52b69d4d-864f-4641-8be6-80a6438cb34e', # oficentro
+    'a70e5131-3f79-4773-b064-681f5afd407b', # idet
+    '7b5dac83-116b-43f2-b98a-706b5112b4c3', # plaza
+    '7f0a2baa-b739-4c0c-bddd-23bc8d10da94', # venemer
+    '348952bc-590d-4f4b-984f-ed4c210a1436', # clinica_el_avila
+    '6c193483-84c3-467b-ab39-1c217ffe7a87', # cashea
+    '0fb541ae-f56d-48bf-8fd9-4279667a4799', # cementerio_del_este
+    'b8a894d0-64bf-4cd0-9f90-c874936d9d19', # cincuentenario_ucab
+    '04e71197-83f5-41e7-89d8-deb10aa3905e' # mercantil
   )
 )
 

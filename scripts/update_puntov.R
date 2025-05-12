@@ -15,6 +15,7 @@ bigrquery::bq_auth(
 )
 
 # Set configs
+maquinas <- maquinas_list$puntov %>% set_names(maquinas_list$epay)
 current_time_locale <- lubridate::with_tz(Sys.time(), 'America/Caracas')
 today <- lubridate::floor_date(current_time_locale, 'day') %>% as_date()
 
@@ -23,7 +24,7 @@ today <- lubridate::floor_date(current_time_locale, 'day') %>% as_date()
 
 # Get sales
 cat('Starting sales ETL\n')
-ventas_resp <- maquinas_list$puntov %>% 
+ventas_resp <- maquinas %>% 
   map(
     possibly(
       ~get_ventas_puntov(.x, .esgaman_token, today, today), 
@@ -69,7 +70,7 @@ almacen %>%
 
 # GET Machine slot positions
 cat('Starting positions ETL\n')
-posicion <- maquinas_list$puntov %>% 
+posicion <- maquinas %>% 
   map(
     ~glue::glue('https://gamantoken.esgaman.com/public/api/{.x}/get_posicion') %>% 
       httr2::request() %>% 

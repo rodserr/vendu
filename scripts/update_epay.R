@@ -15,6 +15,8 @@ bigrquery::bq_auth(
 )
 
 # Set configs
+maquinas <- maquinas_list$epay %>% set_names(maquinas_list$epay)
+
 current_time_locale <- lubridate::with_tz(Sys.time(), 'America/Caracas')
 today <- lubridate::floor_date(current_time_locale, 'day') %>% as_date()
 month <- lubridate::month(today)
@@ -22,7 +24,7 @@ year <- lubridate::year(today)
 
 # Get sales
 cat('Starting sales ETL\n')
-ventas_resp <- maquinas_list$epay %>% 
+ventas_resp <- maquinas %>% 
   map(
     possibly(
       ~get_ventas_epay(.x, endpoint = 'venta', month, year), 
@@ -56,7 +58,7 @@ if(nrow(ventas) > 0){
 
 # GET stores
 cat('Starting store ETL\n')
-almacen <- glue::glue('https://epay.uno/api/?e=prods&id={maquinas_list$epay$netuno}') %>% 
+almacen <- glue::glue('https://epay.uno/api/?e=prods&id={maquinas[[1]]}') %>% 
   httr2::request() %>%
   httr2::req_perform() %>% 
   httr2::resp_body_json() %>% 
@@ -75,7 +77,7 @@ almacen %>%
 
 # GET Machine slot positions
 cat('Starting positions ETL\n')
-posicion <- maquinas_list$epay %>% 
+posicion <- maquinas %>% 
   map(
     ~glue::glue('https://epay.uno/api/?e=canal&id={.x}') %>% 
       httr2::request() %>% 
