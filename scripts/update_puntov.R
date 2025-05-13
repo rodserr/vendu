@@ -41,16 +41,12 @@ ventas <- ventas_resp %>%
   ) %>% 
   list_rbind(names_to = 'id_maquina')
 
-if(nrow(ventas) > 0){
-  ventas %>% 
-    write_sales_condition(
-      current_time_locale,
-      dataset = 'puntov'
-    )
-} else{
-  cat('\nNo sales at run time\n')
-}
-
+ventas %>% 
+  write_vendu_table(
+    dataset = 'puntov',
+    table = 'odsSalesCurrentDay', 
+    write_disposition = 'WRITE_TRUNCATE'
+  )
 
 # GET stores
 cat('Starting store ETL\n')

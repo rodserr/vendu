@@ -27,7 +27,7 @@ cat('Starting sales ETL\n')
 ventas_resp <- maquinas %>% 
   map(
     possibly(
-      ~get_ventas_epay(.x, endpoint = 'venta', month, year), 
+      ~get_ventas_epay(.x, endpoint = 'venta', month, year),
       list()
     )
   )
@@ -45,16 +45,12 @@ ventas <- ventas_resp %>%
   list_rbind(names_to = 'id_maquina') %>% 
   filter(lubridate::floor_date(fecha, 'day') == today)
 
-if(nrow(ventas) > 0){
-  ventas %>% 
-    write_sales_condition(
-      current_time_locale,
-      dataset = 'epay'
-    )
-} else{
-  cat('\nNo sales at run time\n')
-}
-
+ventas %>% 
+  write_vendu_table(
+    dataset = 'epay',
+    table = 'odsSalesCurrentDay', 
+    write_disposition = 'WRITE_TRUNCATE'
+  )
 
 # GET stores
 cat('Starting store ETL\n')
