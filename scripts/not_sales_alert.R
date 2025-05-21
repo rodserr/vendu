@@ -20,7 +20,7 @@ current_hour <- format(current_time_locale, '%I%p') %>% tolower()
 today_sales <- bq_get_today_sales()
 
 # Send Email if meet criteria
-if(any(is.na(today_sales$ventas_n))){
+if(all(!is.na(today_sales$ventas_n))){
   
   cat('\nTodas las maquinas han vendido al menos un producto hoy\n')
   
