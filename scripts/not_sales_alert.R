@@ -47,7 +47,7 @@ if(all(!is.na(today_sales$ventas_n))){
         # to = .to,
         to = 'rodrigoserranom8@gmail.com',
         # bcc = 'rodrigoserranom8@gmail.com',
-        subject = 'Vendu Alert: Máquinas sin ventas',
+        subject = 'Vendu Alert: Maquinas sin ventas',
         credentials = email_creds
       )
     
