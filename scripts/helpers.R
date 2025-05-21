@@ -201,7 +201,7 @@ select
 a.assigned,
 t0.*
 from t0
-left join `puntov.idtAssignments` a on t0.id_maquina = a.id_maquina
+full join `puntov.idtAssignments` a on t0.id_maquina = a.id_maquina
 where a.fecha = current_date('America/Caracas')
   "
   
@@ -214,18 +214,20 @@ where a.fecha = current_date('America/Caracas')
 }
 
 # Compose Email alert
-compose_noSales_alert_email <- function(sales, current_machines, hour){
+compose_noSales_alert_email <- function(sales, hour){
   
   # Identify Machines without sales
-  maquinas <- names(current_machines)
-  maquinas_w_sales <- sales$id_maquina
-  maquinas_wo_sales <- maquinas[!maquinas %in% maquinas_w_sales]
+  maquinas_wo_sales <- sales %>% 
+    filter(is.na(ventas_n)) %>% 
+    pull(assigned)
   
   # Build sales resume
   if(nrow(sales) > 0){
     sales_vector <- sales %>% 
+      filter(!is.na(ventas_n)) %>% 
+      arrange(desc(ventas_usd)) %>% 
       mutate(
-        sales_ = glue::glue('- **`{id_maquina}`**: ${round(ventas_usd, 2)}')
+        sales_ = glue::glue('- **`{assigned}`**: ${round(ventas_usd, 2)}')
       ) %>% 
       pull(sales_) %>% 
       paste0(collapse = '\n')
