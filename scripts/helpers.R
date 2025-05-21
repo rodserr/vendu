@@ -182,6 +182,8 @@ get_ventas_epay <- function(id_maq, endpoint = 'venta', month, year){
 # GET today sales from bigquery
 bq_get_today_sales <- function(){
   query <- "
+with
+t0 as (
   SELECT id_maquina, count(*) as ventas_n, sum(precio_venta_divisas) as ventas_usd,
   FROM `vendu-tech.puntov.odsSalesCurrentDay` 
   GROUP BY 1
@@ -193,6 +195,14 @@ bq_get_today_sales <- function(){
   LEFT JOIN `epay.odsStore` st on st.rowid = sales.producto
   LEFT JOIN `puntov.odsStore` pv on pv.id_producto = st.codigo
   GROUP BY 1
+)
+
+select
+a.assigned,
+t0.*
+from t0
+left join `puntov.idtAssignments` a on t0.id_maquina = a.id_maquina
+where a.fecha = current_date('America/Caracas')
   "
   
   bigrquery::bq_project_query(
