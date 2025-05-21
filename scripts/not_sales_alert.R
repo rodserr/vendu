@@ -48,7 +48,8 @@ if(all(!is.na(today_sales$ventas_n))){
         to = 'rodrigoserranom8@gmail.com',
         # bcc = 'rodrigoserranom8@gmail.com',
         subject = 'Vendu Alert: Maquinas sin ventas',
-        credentials = email_creds
+        credentials = email_creds,
+        verify = TRUE
       )
     
   },
