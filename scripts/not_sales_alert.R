@@ -53,18 +53,9 @@ if(all(!is.na(today_sales$ventas_n))){
     
   },
   error = function(e){
-    
-    cat('Error enviando email, intentando de nuevo\n')
-    Sys.sleep(5)
-    alert_email %>% 
-      smtp_send(
-        from = Sys.getenv('GMAIL_ACCOUNT'),
-        # to = .to,
-        to = 'rodrigoserranom8@gmail.com',
-        # bcc = 'rodrigoserranom8@gmail.com',
-        subject = 'Vendu Alert: Máquinas sin ventas',
-        credentials = email_creds
-      )
+    cat("Error de R capturado:\n")
+    print(e)
+    stop(e)
     
   })
   
