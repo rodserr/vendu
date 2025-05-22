@@ -184,13 +184,21 @@ bq_get_today_sales <- function(){
   query <- "
 with
 t0 as (
-  SELECT id_maquina, count(*) as ventas_n, sum(precio_venta_divisas) as ventas_usd,
+  SELECT 
+    id_maquina,
+    count(*) as ventas_n,
+    sum(precio_venta_divisas) as ventas_usd,
+    max(fecha) as lastSaleHour
   FROM `vendu-tech.puntov.odsSalesCurrentDay` 
   GROUP BY 1
   
   UNION ALL 
   
-  SELECT sales.id_maquina, count(*) as ventas_n, sum(pv.precio_de_venta) as ventas_usd 
+  SELECT 
+    sales.id_maquina, 
+    count(*) as ventas_n,
+    sum(pv.precio_de_venta) as ventas_usd,
+    max(fecha) as lastSaleHour 
   FROM `vendu-tech.epay.odsSalesCurrentDay` sales
   LEFT JOIN `epay.odsStore` st on st.rowid = sales.producto
   LEFT JOIN `puntov.odsStore` pv on pv.id_producto = st.codigo
@@ -227,7 +235,8 @@ compose_noSales_alert_email <- function(sales, hour){
       filter(!is.na(ventas_n)) %>% 
       arrange(desc(ventas_usd)) %>% 
       mutate(
-        sales_ = glue::glue('- **`{assigned}`**: ${round(ventas_usd, 2)}')
+        hour_ = strftime(lastSaleHour, '%I:%M %p', tz = 'America/Caracas'),
+        sales_ = glue::glue('- **`{assigned}`**: `${round(ventas_usd, 2)}`   Última venta a las {hour_}')
       ) %>% 
       pull(sales_) %>% 
       paste0(collapse = '\n')

@@ -39,15 +39,15 @@ if(all(!is.na(today_sales$ventas_n))){
   )
   
   # Send email
-  # .to <- c('carlos@tuvendu.com', 'miguel@tuvendu.com', 'alessandro@tuvendu.com')
+  .to <- c('carlos@tuvendu.com', 'miguel@tuvendu.com', 'alessandro@tuvendu.com')
   tryCatch({
     alert_email %>% 
       smtp_send(
         from = Sys.getenv('GMAIL_ACCOUNT'),
-        # to = .to,
-        to = 'rodrigoserranom8@gmail.com',
-        # bcc = 'rodrigoserranom8@gmail.com',
-        subject = 'Vendu Alert: Maquinas sin ventas',
+        to = .to,
+        # to = 'rodrigoserranom8@gmail.com',
+        bcc = 'rodrigoserranom8@gmail.com',
+        subject = 'Vendu Alert: Resumen de ventas',
         credentials = email_creds,
         verbose = TRUE
       )
