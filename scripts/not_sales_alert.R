@@ -29,8 +29,8 @@ if(all(!is.na(today_sales$ventas_n))){
   cat('\nAl menos una maquina no cumple los criterios, enviando Email\n')
   
   # Compose Email
-  # alert_email <- compose_noSales_alert_email(today_sales, current_hour)
-  alert_email <- blastula::compose_email(body='email de prueba')
+  alert_email <- compose_noSales_alert_email(today_sales, current_hour)
+  # alert_email <- blastula::compose_email(body='email de prueba')
   
   # Create Credentials
   email_creds <- blastula::creds_envvar(
@@ -40,14 +40,14 @@ if(all(!is.na(today_sales$ventas_n))){
   )
   
   # Send email
-  # .to <- c('carlos@tuvendu.com', 'miguel@tuvendu.com', 'alessandro@tuvendu.com')
+  .to <- c('carlos@tuvendu.com', 'miguel@tuvendu.com', 'alessandro@tuvendu.com')
   tryCatch({
     alert_email %>% 
       smtp_send(
         from = Sys.getenv('GMAIL_ACCOUNT'),
-        # to = .to,
-        to = 'rodrigoserranom8@gmail.com',
-        # bcc = 'rodrigoserranom8@gmail.com',
+        to = .to,
+        # to = 'rodrigoserranom8@gmail.com',
+        bcc = 'rodrigoserranom8@gmail.com',
         subject = 'Vendu Alert: Resumen de ventas',
         credentials = email_creds,
         verbose = TRUE
