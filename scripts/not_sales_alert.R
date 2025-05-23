@@ -55,7 +55,7 @@ if(all(!is.na(today_sales$ventas_n))){
     
   },
   error = function(e){
-    cat("Error de R capturado:\n")
+    cat('Error de R capturado:\n')
     print(e)
     stop(e)
     

@@ -68,8 +68,8 @@ write_vendu_table <- function(
     project = 'vendu-tech',
     dataset = 'puntov', 
     table, 
-    create_disposition = "CREATE_IF_NEEDED", 
-    write_disposition = "WRITE_TRUNCATE", 
+    create_disposition = 'CREATE_IF_NEEDED', 
+    write_disposition = 'WRITE_TRUNCATE', 
     quiet = F
 ){
   
@@ -181,7 +181,7 @@ get_ventas_epay <- function(id_maq, endpoint = 'venta', month, year){
 
 # GET today sales from bigquery
 bq_get_today_sales <- function(){
-  query <- "
+  query <- '
 with
 t0 as (
   SELECT 
@@ -211,7 +211,7 @@ t0.*
 from t0
 full join `puntov.idtAssignments` a on t0.id_maquina = a.id_maquina
 where a.fecha = current_date('America/Caracas')
-  "
+  '
   
   bigrquery::bq_project_query(
     x = 'vendu-tech',
@@ -248,7 +248,7 @@ compose_noSales_alert_email <- function(sales, hour){
   
   # Add Vendu Logo
   img_file <- add_image(
-    file = "inst/styles/logo_vendunegro-01.png",
+    file = 'inst/styles/logo_vendunegro-01.png',
     width = 150,
     align = 'center'
   )
@@ -257,7 +257,7 @@ compose_noSales_alert_email <- function(sales, hour){
   # print(maq_fmt)
   body_text <-
     glue::glue(
-      "
+      '
       
       ## 🚨  Alerta de Ventas 
       
@@ -270,7 +270,7 @@ compose_noSales_alert_email <- function(sales, hour){
       
       #### Resumen de Ventas del Día
       {sales_vector}
-      "   
+      '   
     )
   
   blastula::compose_email(body = md(c(img_file, body_text)))
