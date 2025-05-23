@@ -102,7 +102,7 @@
     },
     "blastula": {
       "Package": "blastula",
-      "Version": "0.3.5",
+      "Version": "0.3.6",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -125,7 +125,7 @@
         "stringr",
         "uuid"
       ],
-      "Hash": "0a4a92a60e3d152c7797f166cf927239"
+      "Hash": "e52735685fb373ed0d4f5548cd3c3be6"
     },
     "brio": {
       "Package": "brio",
