@@ -210,7 +210,7 @@ a.assigned,
 t0.*
 from t0
 full join `puntov.idtAssignments` a on t0.id_maquina = a.id_maquina
-where a.fecha = current_date('America/Caracas')
+where a.fecha = current_date("America/Caracas")
   '
   
   bigrquery::bq_project_query(
