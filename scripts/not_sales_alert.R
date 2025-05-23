@@ -29,7 +29,8 @@ if(all(!is.na(today_sales$ventas_n))){
   cat('\nAl menos una maquina no cumple los criterios, enviando Email\n')
   
   # Compose Email
-  alert_email <- compose_noSales_alert_email(today_sales, current_hour)
+  # alert_email <- compose_noSales_alert_email(today_sales, current_hour)
+  alert_email <- blastula::compose_email(body='email de prueba')
   
   # Create Credentials
   email_creds <- blastula::creds_envvar(
