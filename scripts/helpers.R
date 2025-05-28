@@ -190,6 +190,7 @@ t0 as (
     sum(precio_venta_divisas) as ventas_usd,
     max(fecha) as lastSaleHour
   FROM `vendu-tech.puntov.odsSalesCurrentDay` 
+  WHERE date(timestamp_sub(fecha, INTERVAL 4 HOUR)) = current_date()
   GROUP BY 1
   
   UNION ALL 
@@ -198,10 +199,11 @@ t0 as (
     sales.id_maquina, 
     count(*) as ventas_n,
     sum(pv.precio_de_venta) as ventas_usd,
-    max(fecha) as lastSaleHour 
+    max(sales.fecha) as lastSaleHour 
   FROM `vendu-tech.epay.odsSalesCurrentDay` sales
   LEFT JOIN `epay.odsStore` st on st.rowid = sales.producto
   LEFT JOIN `puntov.odsStore` pv on pv.id_producto = st.codigo
+  WHERE date(timestamp_sub(sales.fecha, INTERVAL 4 HOUR)) = current_date()
   GROUP BY 1
 )
 
@@ -236,7 +238,7 @@ compose_noSales_alert_email <- function(sales, hour){
       arrange(desc(ventas_usd)) %>% 
       mutate(
         hour_ = strftime(lastSaleHour, '%I:%M %p', tz = 'America/Caracas'),
-        sales_ = glue::glue('- **`{assigned}`**: `${round(ventas_usd, 2)}`   Última venta a las {hour_}')
+        sales_ = glue::glue('- **`{assigned}`**: `${round(ventas_usd, 2)}`   Última venta a las `{hour_}`')
       ) %>% 
       pull(sales_) %>% 
       paste0(collapse = '\n')
