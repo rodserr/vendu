@@ -25,6 +25,14 @@ jobs:
         run: |
           sudo apt-get update -y
           sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+      - name: Test DNS Resolution for smtp.gmail.com
+        run: |
+          echo "Attempting nslookup..."
+          nslookup smtp.gmail.com || echo "nslookup failed"
+          echo "Attempting dig..."
+          dig smtp.gmail.com || echo "dig failed"
+          echo "Attempting getent hosts..."
+          getent hosts smtp.gmail.com || echo "getent hosts failed"
       - name: Execute Script
         run: |
           Rscript "scripts/not_sales_alert.R"
