@@ -19,52 +19,40 @@ current_hour <- format(current_time_locale, '%I%p') %>% tolower()
 # GET  Today Sales
 today_sales <- bq_get_today_sales()
 
-# Send Email if meet criteria
-if(all(!is.na(today_sales$ventas_n))){
+# Compose Email
+alert_email <- compose_noSales_alert_email(today_sales, current_hour)
+# alert_email <- blastula::compose_email(body='email de prueba')
+
+# Create Credentials
+email_creds <- blastula::creds_envvar(
+  user = Sys.getenv('GMAIL_ACCOUNT'),
+  pass_envvar = 'GOOGLE_APP_PASSWORD',
+  provider = 'gmail'
+)
+
+# Report state
+print(sessionInfo())
+cat('Size of Email: ', object.size(alert_email)/1000, '\n')
+cat('Size of Table: ', object.size(today_sales)/1000, '\n')
+
+# Send email
+.to <- c('carlos@tuvendu.com', 'miguel@tuvendu.com', 'alessandro@tuvendu.com')
+tryCatch({
+  alert_email %>% 
+    smtp_send(
+      from = Sys.getenv('GMAIL_ACCOUNT'),
+      to = .to,
+      # to = 'rodrigoserranom8@gmail.com',
+      bcc = 'rodrigoserranom8@gmail.com',
+      subject = 'Vendu Alert: Resumen de ventas',
+      credentials = email_creds,
+      verbose = TRUE
+    )
   
-  cat('\nTodas las maquinas han vendido al menos un producto hoy\n')
+},
+error = function(e){
+  cat('Error de R capturado:\n')
+  print(e)
+  stop(e)
   
-} else{
-  
-  cat('\nAl menos una maquina no cumple los criterios, enviando Email\n')
-  
-  # Compose Email
-  alert_email <- compose_noSales_alert_email(today_sales, current_hour)
-  # alert_email <- blastula::compose_email(body='email de prueba')
-  
-  # Create Credentials
-  email_creds <- blastula::creds_envvar(
-    user = Sys.getenv('GMAIL_ACCOUNT'),
-    pass_envvar = 'GOOGLE_APP_PASSWORD',
-    provider = 'gmail'
-  )
-  
-  # Report state
-  print(sessionInfo())
-  cat('Size of Email: ', object.size(alert_email)/1000, '\n')
-  cat('Size of Table: ', object.size(today_sales)/1000, '\n')
-  
-  # Send email
-  .to <- c('carlos@tuvendu.com', 'miguel@tuvendu.com', 'alessandro@tuvendu.com')
-  tryCatch({
-    alert_email %>% 
-      smtp_send(
-        from = Sys.getenv('GMAIL_ACCOUNT'),
-        to = .to,
-        # to = 'rodrigoserranom8@gmail.com',
-        bcc = 'rodrigoserranom8@gmail.com',
-        subject = 'Vendu Alert: Resumen de ventas',
-        credentials = email_creds,
-        verbose = TRUE
-      )
-    
-  },
-  error = function(e){
-    cat('Error de R capturado:\n')
-    print(e)
-    stop(e)
-    
-  })
-  
-  
-}
+})

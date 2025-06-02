@@ -243,10 +243,13 @@ compose_noSales_alert_email <- function(sales, hour){
       arrange(desc(ventas_usd)) %>% 
       mutate(
         hour_ = strftime(lastSaleHour, '%I:%M %p', tz = 'America/Caracas'),
-        sales_ = glue::glue('- **`{assigned}`**: `${round(ventas_usd, 2)}`   Última venta a las `{hour_}`')
-      ) %>% 
-      pull(sales_) %>% 
+        sales_ = glue::glue('- **`{assigned}`**: `${round(ventas_usd, 2)}` | `{hour_}`')
+      ) %>%
+      pull(sales_) %>%
       paste0(collapse = '\n')
+    
+    total_sales_usd <- sales$ventas_usd %>% sum(na.rm = TRUE) %>% round(2)
+    total_sales_n <- sales$ventas_n %>% sum(na.rm = TRUE)
     
   }
   else{
@@ -266,20 +269,25 @@ compose_noSales_alert_email <- function(sales, hour){
     glue::glue(
       '
       
-      ## 🚨  Alerta de Ventas 
+      ## 📊  Resumen de Ventas del Día
+      A las `{hour}` de hoy
       
-      A las `{hour}` de hoy, las máquinas:
+      - Monto Facturado: **`${total_sales_usd}`** 
+      
+      - Transacciones Registradas: **`{total_sales_n}`**
+      
+      Detalle por Máquina (Facturado | Hora de Última venta):
+      
+      {sales_vector}
+      
+      #### Máquinas sin ventas registradas:
       
       {maq_fmt}
-      
-      No han vendido ningún producto. 
-      Quizás quieras revisar que estén operando correctamente.
-      
-      #### Resumen de Ventas del Día
-      {sales_vector}
       '   
     )
   
   blastula::compose_email(body = md(c(img_file, body_text)))
   
 }
+
+compose_noSales_alert_email(today_sales, current_hour)
