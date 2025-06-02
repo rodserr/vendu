@@ -10,14 +10,19 @@ maquinas_list <- list(
   epay = list(
     '6edeae11-a06d-4dd7-b766-75257b55a1d8', # netuno
     '52b69d4d-864f-4641-8be6-80a6438cb34e', # oficentro
-    'a70e5131-3f79-4773-b064-681f5afd407b', # idet
-    '7b5dac83-116b-43f2-b98a-706b5112b4c3', # plaza
+    'a70e5131-3f79-4773-b064-681f5afd407b', # tamanaco
+    '7b5dac83-116b-43f2-b98a-706b5112b4c3', # Casagrande
     '7f0a2baa-b739-4c0c-bddd-23bc8d10da94', # venemer
-    '348952bc-590d-4f4b-984f-ed4c210a1436', # clinica_el_avila
+    '348952bc-590d-4f4b-984f-ed4c210a1436', # Idet sn
     '6c193483-84c3-467b-ab39-1c217ffe7a87', # cashea
     '0fb541ae-f56d-48bf-8fd9-4279667a4799', # cementerio_del_este
     'b8a894d0-64bf-4cd0-9f90-c874936d9d19', # cincuentenario_ucab
-    '04e71197-83f5-41e7-89d8-deb10aa3905e' # mercantil
+    '04e71197-83f5-41e7-89d8-deb10aa3905e', # mercantil
+    '96374528-7ecb-46fa-8e8a-6d1c9aac0399', # sanatrix
+    '98102415-cd5d-4db6-ab5b-001b8bb1341b', # los sauces
+    '920dd6f8-9833-457c-b32d-53d11d1ebec3', # casino sn
+    'b5fd0924-afa6-490a-a458-dab1c888a104', # pendiente
+    'e07d26b2-2f8c-4225-802f-26cfbd39948b' # cafe
   )
 )
 
