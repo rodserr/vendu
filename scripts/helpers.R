@@ -289,5 +289,3 @@ compose_noSales_alert_email <- function(sales, hour){
   blastula::compose_email(body = md(c(img_file, body_text)))
   
 }
-
-compose_noSales_alert_email(today_sales, current_hour)
