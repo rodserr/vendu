@@ -195,7 +195,7 @@ t0 as (
     sum(precio_venta_divisas) as ventas_usd,
     max(fecha) as lastSaleHour
   FROM `vendu-tech.puntov.odsSalesCurrentDay` 
-  WHERE date(timestamp_sub(fecha, INTERVAL 4 HOUR)) = current_date()
+  WHERE date(fecha) = current_date()
   GROUP BY 1
   
   UNION ALL 
