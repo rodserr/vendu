@@ -1,6 +1,6 @@
 on:
   schedule: 
-    - cron:  "30 3,12,15,22 * * *" # 12pm 9am 12am 7pm
+    - cron:  "24 3,12,15,22 * * *" # 12pm 9am 12am 7pm
     - cron:  "20 18,19 * * *" # 2.20pm 3.20pm
   workflow_dispatch:
   
