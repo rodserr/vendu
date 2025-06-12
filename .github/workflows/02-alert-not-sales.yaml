@@ -1,6 +1,6 @@
 on:
-  schedule: 
-    - cron:  "0 13,16,23 * * 1-5" # 9am 12am 7pm
+  # schedule:
+  #   - cron:  "0 13,16,23 * * 1-5" # 9am 12am 7pm
   workflow_dispatch:
   
 name: alert-not-sales
