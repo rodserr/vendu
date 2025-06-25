@@ -22,7 +22,10 @@ maquinas_list <- list(
     '98102415-cd5d-4db6-ab5b-001b8bb1341b', # los sauces
     '920dd6f8-9833-457c-b32d-53d11d1ebec3', # casino sn
     'b5fd0924-afa6-490a-a458-dab1c888a104', # pendiente
-    'e07d26b2-2f8c-4225-802f-26cfbd39948b' # cafe
+    'e07d26b2-2f8c-4225-802f-26cfbd39948b', # cafe
+    'b7aa53ea-5938-4b51-80d0-c8c49973393e', 
+    'ka4d7fd39-afaf-4a59-8659-b192675e64e3',
+    'f3d84ff8-57b5-4ba0-8a87-6b3cdb93b07f'
   )
 )
 
