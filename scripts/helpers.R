@@ -25,7 +25,8 @@ maquinas_list <- list(
     'e07d26b2-2f8c-4225-802f-26cfbd39948b', # cafe
     'b7aa53ea-5938-4b51-80d0-c8c49973393e', 
     'ka4d7fd39-afaf-4a59-8659-b192675e64e3',
-    'f3d84ff8-57b5-4ba0-8a87-6b3cdb93b07f'
+    'f3d84ff8-57b5-4ba0-8a87-6b3cdb93b07f',
+    'k106f56eb-3146-45bc-b9ab-d875a59a896e'
   )
 )
 
