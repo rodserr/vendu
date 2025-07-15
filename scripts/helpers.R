@@ -189,40 +189,11 @@ get_ventas_epay <- function(id_maq, endpoint = 'venta', month, year){
 ################ EMAIL ALERT ################
 
 # GET today sales from bigquery
-bq_get_today_sales <- function(){
-  query <- '
-with
-t0 as (
-  SELECT 
-    id_maquina,
-    count(*) as ventas_n,
-    sum(precio_venta_divisas) as ventas_usd,
-    max(fecha) as lastSaleHour
-  FROM `vendu-tech.puntov.odsSalesCurrentDay` 
-  WHERE date(fecha) = current_date()
-  GROUP BY 1
+bq_get_today_sales <- function(hour_){
   
-  UNION ALL 
-  
-  SELECT 
-    sales.id_maquina, 
-    count(*) as ventas_n,
-    sum(pv.precio_de_venta) as ventas_usd,
-    max(sales.fecha) as lastSaleHour 
-  FROM `vendu-tech.epay.odsSalesCurrentDay` sales
-  LEFT JOIN `epay.odsStore` st on st.rowid = sales.producto
-  LEFT JOIN `puntov.odsStore` pv on pv.id_producto = st.codigo
-  WHERE date(timestamp_sub(sales.fecha, INTERVAL 4 HOUR)) = current_date()
-  GROUP BY 1
-)
-
-select
-a.assigned,
-t0.*
-from t0
-full join `puntov.idtAssignments` a on t0.id_maquina = a.id_maquina
-where a.fecha = current_date("America/Caracas")
-  '
+  query <- glue::glue('
+SELECT * FROM `vendu-tech.prodVendu.emailSales`({hour_})
+  ')
   
   bigrquery::bq_project_query(
     x = 'vendu-tech',
@@ -233,18 +204,18 @@ where a.fecha = current_date("America/Caracas")
 }
 
 # Compose Email alert
-compose_noSales_alert_email <- function(sales, hour){
+compose_noSales_alert_email_deprecated <- function(sales, hour){
   
   # Identify Machines without sales
-  maquinas_wo_sales <- sales %>% 
-    filter(is.na(ventas_n)) %>% 
+  maquinas_wo_sales <- sales %>%
+    filter(is.na(ventas_n)) %>%
     pull(assigned)
   
   # Build sales resume
   if(nrow(sales) > 0){
-    sales_vector <- sales %>% 
-      filter(!is.na(ventas_n)) %>% 
-      arrange(desc(ventas_usd)) %>% 
+    sales_vector <- sales %>%
+      filter(!is.na(ventas_n)) %>%
+      arrange(desc(ventas_usd)) %>%
       mutate(
         hour_ = strftime(lastSaleHour, '%I:%M %p', tz = 'America/Caracas'),
         sales_ = glue::glue('- **`{assigned}`**: `${round(ventas_usd, 2)}` | `{hour_}`')
@@ -287,6 +258,98 @@ compose_noSales_alert_email <- function(sales, hour){
       #### Máquinas sin ventas registradas:
       
       {maq_fmt}
+      '   
+    )
+  
+  blastula::compose_email(body = md(c(img_file, body_text)))
+  
+}
+
+
+# Compose Email alert
+compose_noSales_alert_email <- function(sales, hour_){
+  
+  current_hour_fmt <- format(hour_, '%I%p') %>% tolower()
+  
+  # Build sales resume
+  if(nrow(sales) > 0){
+    
+    sales_vector <- sales %>% 
+      filter(!is.na(ventas_n)) %>% 
+      arrange(desc(ventas_usd)) %>%
+      select(assigned, ventas_n, ventas_usd, lastSaleAt) %>%
+      gt(
+        rowname_col = 'assigned',
+      ) %>% 
+      fmt_currency(
+        columns = ventas_usd,
+        currency = 'USD'
+      ) %>%
+      fmt_datetime(
+        columns = lastSaleAt,
+        format = '%I:%M %p'
+      ) %>% 
+      cols_label(
+        ventas_n = 'Órdenes',
+        ventas_usd = 'Facturado',
+        lastSaleAt = 'Hora de Última venta'
+      ) %>% 
+      gt::as_raw_html()
+    
+    total_sales_usd <- sales$ventas_usd %>% sum(na.rm = TRUE) %>% round(2)
+    total_sales_n <- sales$ventas_n %>% sum(na.rm = TRUE)
+    
+  }
+  else{
+    sales_vector <- 'No hay ventas registradas'
+  }
+  
+  # Identify Machines without sales
+  no_sales_vector <- sales %>% 
+    filter(is.na(ventas_n)) %>% 
+    arrange(desc(lastSaleAt)) %>%
+    mutate(
+      days_no_sale = difftime(current_time_locale, lastSaleAt),
+      prob = round(daysWithSalesAtHour/daysWithSales, 2)
+    ) %>% 
+    select(assigned, lastSaleAt, days_no_sale, prob) %>% 
+    gt(
+      rowname_col = 'assigned',
+    ) %>% 
+    fmt_duration(
+      columns = days_no_sale,
+      output_units = c('days', "hours")
+    ) %>% 
+    cols_label(
+      lastSaleAt = 'Fecha Última venta',
+      days_no_sale = 'Tiempo desde Última venta',
+      prob = glue::glue('P(Al menos una Venta antes de las {current_hour_fmt})')
+    ) %>% 
+    gt::as_raw_html()
+  
+  # Add Vendu Logo
+  img_file <- add_image(
+    file = 'inst/styles/logo_vendunegro-01.png',
+    width = 150,
+    align = 'center'
+  )
+  
+  body_text <-
+    glue::glue(
+      '
+      
+      ## 📊  Resumen de Ventas del Día
+      A las `{current_hour_fmt}` de hoy
+      
+      - Monto Facturado: **`${total_sales_usd}`** 
+      
+      - Transacciones Registradas: **`{total_sales_n}`**
+      
+      {sales_vector}
+      
+      #### Máquinas sin ventas registradas:
+      
+      {no_sales_vector}
       '   
     )
   

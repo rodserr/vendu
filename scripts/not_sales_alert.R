@@ -2,6 +2,8 @@ library(dplyr)
 library(bigrquery)
 library(blastula)
 library(purrr)
+library(lubridate)
+library(gt)
 source('scripts/helpers.R')
 
 # Decrypt BQ key and authenticate
@@ -14,13 +16,13 @@ bigrquery::bq_auth(
 
 # Caracas Time
 current_time_locale <- lubridate::with_tz(Sys.time(), 'America/Caracas')
-current_hour <- format(current_time_locale, '%I%p') %>% tolower()
+current_hour <- lubridate::hour(current_time_locale)
 
 # GET  Today Sales
-today_sales <- bq_get_today_sales()
+today_sales <- bq_get_today_sales(current_hour)
 
 # Compose Email
-alert_email <- compose_noSales_alert_email(today_sales, current_hour)
+alert_email <- compose_noSales_alert_email(today_sales, current_time_locale)
 # alert_email <- blastula::compose_email(body='email de prueba')
 
 # Create Credentials
