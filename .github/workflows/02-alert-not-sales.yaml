@@ -20,11 +20,11 @@ jobs:
         with:
           use-public-rspm: true
           r-version: '4.4.1'
-      - uses: r-lib/actions/setup-renv@v2
       - name: Install system dependencies
         run: |
           sudo apt-get update -y
-          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev
+          sudo apt-get install -y libcurl4-openssl-dev libssl-dev libxml2-dev libv8-dev
+      - uses: r-lib/actions/setup-renv@v2
       - name: Test DNS Resolution for smtp.gmail.com
         run: |
           echo "Attempting nslookup..."
