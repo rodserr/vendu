@@ -28,7 +28,10 @@ maquinas_list <- list(
     'f3d84ff8-57b5-4ba0-8a87-6b3cdb93b07f',
     'k106f56eb-3146-45bc-b9ab-d875a59a896e',
     '95755383-0eaa-4859-bfe8-6e3fd2a374aax',
-    '95755383-0eaa-4859-bfe8-6e3fd2a374aa'
+    '95755383-0eaa-4859-bfe8-6e3fd2a374aa',
+    '2e974aa9-3836-4432-9152-8fc2d59bbc71',
+    'db7bb43f-c75e-4527-bcd0-5b42615cbc80',
+    '7822e461-5603-4ab3-a188-0b2a491504eb'
   )
 )
 
