@@ -108,7 +108,7 @@ clean_response <- function(
     mutate(
       across(any_of(.numeric_fields), as.numeric),
       across(any_of(.integer_fields), as.integer), 
-      across(any_of('fecha'), as.POSIXct), 
+      across(any_of('fecha'), ~as.POSIXct(.x, tz = "America/Caracas")), 
       fecha_consulta = .fecha_consulta
     )
 }
