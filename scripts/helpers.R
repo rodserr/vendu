@@ -26,7 +26,7 @@ bq_get_maquinas <- function(){
 }
 
 bq_get_last_sale <- function(dataset){
-  query <- glue::glue("SELECT max(fecha) as lastSaleAt from `{dataset}.odsSales`")
+  query <- glue::glue("SELECT UNIX_SECONDS( max(fecha) ) as lastSaleAt from `{dataset}.odsSales`")
   
   bigrquery::bq_project_query(
     x = 'vendu-tech',
