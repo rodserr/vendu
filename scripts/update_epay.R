@@ -20,7 +20,6 @@ maquinas <- maquinas_vendu$epay %>% set_names(maquinas_vendu$epay)
 
 last_sale_at <- bq_get_last_sale('epay')
 last_sale_at_locale <- lubridate::as_datetime(last_sale_at$lastSaleAt, tz = 'America/Caracas') %m+% hours(4)
-cat('Last Sale in BQ at: ', last_sale_at_locale,' \n')
 cat('Last Sale in BQ at: ', as.character(last_sale_at_locale),' \n')
 
 current_time_locale <- lubridate::with_tz(Sys.time(), 'America/Caracas')
