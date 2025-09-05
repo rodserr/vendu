@@ -32,10 +32,14 @@ RUN R -e "Sys.setenv(RENV_DOWNLOAD_METHOD = 'libcurl')"
 # Si tienes un renv.lock, descomenta la siguiente línea y asegúrate de haber copiado renv.lock
 RUN R -e "renv::restore(repos = getOption('repos'))"
 # Copia tu script R y cualquier otro archivo necesario al contenedor
-# Asegúrate de que la ruta sea correcta, por ejemplo, si tu script está en la carpeta 'scripts'
+# Asegúrate de que la ruta sea correcta, por ejemplo, si tu script está en la carpeta 'scripts'# Set the entrypoint to a shell script
+# ENTRYPOINT ["/bin/bash", "-c"]
+# COPY scripts/ /app/scripts/
+# COPY scripts/ /app/
 COPY scripts/not_sales_alert.R /app/not_sales_alert.R
 COPY scripts/helpers.R /app/scripts/helpers.R
 
 # Comando que se ejecutará cuando el contenedor inicie
 # Este comando ejecutará tu script R
+# CMD ["Rscript", "$1"]
 CMD ["Rscript", "not_sales_alert.R"]

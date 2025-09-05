@@ -15,9 +15,15 @@ bigrquery::bq_auth(
 )
 
 # Set configs
-maquinas <- maquinas_list$puntov %>% set_names(maquinas_list$puntov)
+maquinas_vendu <- bq_get_maquinas()
+maquinas <- maquinas_vendu$puntov %>% set_names(maquinas_vendu$puntov)
+
+last_sale_at <- bq_get_last_sale('puntov')
+last_sale_at_locale <- lubridate::with_tz(last_sale_at$lastSaleAt, 'America/Caracas') %m+% hours(4)
+
 current_time_locale <- lubridate::with_tz(Sys.time(), 'America/Caracas')
 today <- lubridate::floor_date(current_time_locale, 'day') %>% as_date()
+yesterday <- today %m-% days(1)
 
 # Get Token
 .esgaman_token <- get_token(Sys.getenv('ESGAMAN_MAIL'), Sys.getenv('ESGAMAN_PWD'))
@@ -27,7 +33,7 @@ cat('Starting sales ETL\n')
 ventas_resp <- maquinas %>% 
   map(
     possibly(
-      ~get_ventas_puntov(.x, .esgaman_token, today, today), 
+      ~get_ventas_puntov(.x, .esgaman_token, yesterday, today), 
       list()
     ) 
   )
@@ -39,13 +45,14 @@ ventas <- ventas_resp %>%
       pluck('ventas', 1) %>% 
       clean_response(.fecha_consulta = current_time_locale)
   ) %>% 
-  list_rbind(names_to = 'id_maquina')
+  list_rbind(names_to = 'id_maquina') %>% 
+  filter(fecha > last_sale_at_locale)
 
 ventas %>% 
   write_vendu_table(
     dataset = 'puntov',
-    table = 'odsSalesCurrentDay', 
-    write_disposition = 'WRITE_TRUNCATE'
+    table = 'odsSales', 
+    write_disposition = 'WRITE_APPEND'
   )
 
 # GET stores

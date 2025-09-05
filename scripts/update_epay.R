@@ -15,7 +15,11 @@ bigrquery::bq_auth(
 )
 
 # Set configs
-maquinas <- maquinas_list$epay %>% set_names(maquinas_list$epay)
+maquinas_vendu <- bq_get_maquinas()
+maquinas <- maquinas_vendu$epay %>% set_names(maquinas_vendu$epay)
+
+last_sale_at <- bq_get_last_sale('epay')
+last_sale_at_locale <- lubridate::with_tz(last_sale_at$lastSaleAt, 'America/Caracas') %m+% hours(4)
 
 current_time_locale <- lubridate::with_tz(Sys.time(), 'America/Caracas')
 today <- lubridate::floor_date(current_time_locale, 'day') %>% as_date()
@@ -43,13 +47,13 @@ ventas <- ventas_resp %>%
       )
   ) %>% 
   list_rbind(names_to = 'id_maquina') %>% 
-  filter(lubridate::floor_date(fecha, 'day') == today)
+  filter(fecha > last_sale_at_locale)
 
 ventas %>% 
   write_vendu_table(
     dataset = 'epay',
-    table = 'odsSalesCurrentDay', 
-    write_disposition = 'WRITE_TRUNCATE'
+    table = 'odsSales', 
+    write_disposition = 'WRITE_APPEND'
   )
 
 # GET stores

@@ -1,41 +1,76 @@
 ################ GLOBAL FUNCTIONS ################
 
-# Maquinas List
-maquinas_list <- list(
-  puntov = list(
-    'GVRC004_VENDU1', 
-    'GVRC004_VENDU2', 
-    'MERC1'
-  ),
-  epay = list(
-    '6edeae11-a06d-4dd7-b766-75257b55a1d8', 
-    '52b69d4d-864f-4641-8be6-80a6438cb34e',
-    'a70e5131-3f79-4773-b064-681f5afd407b', 
-    '7b5dac83-116b-43f2-b98a-706b5112b4c3',
-    '7f0a2baa-b739-4c0c-bddd-23bc8d10da94',
-    '348952bc-590d-4f4b-984f-ed4c210a1436',
-    '6c193483-84c3-467b-ab39-1c217ffe7a87',
-    '0fb541ae-f56d-48bf-8fd9-4279667a4799', 
-    'b8a894d0-64bf-4cd0-9f90-c874936d9d19', 
-    '04e71197-83f5-41e7-89d8-deb10aa3905e',
-    '96374528-7ecb-46fa-8e8a-6d1c9aac0399',
-    '98102415-cd5d-4db6-ab5b-001b8bb1341b',
-    '920dd6f8-9833-457c-b32d-53d11d1ebec3', 
-    'b5fd0924-afa6-490a-a458-dab1c888a104',
-    'e07d26b2-2f8c-4225-802f-26cfbd39948b',
-    'b7aa53ea-5938-4b51-80d0-c8c49973393e', 
-    'ka4d7fd39-afaf-4a59-8659-b192675e64e3',
-    'f3d84ff8-57b5-4ba0-8a87-6b3cdb93b07f',
-    'k106f56eb-3146-45bc-b9ab-d875a59a896e',
-    '95755383-0eaa-4859-bfe8-6e3fd2a374aax',
-    '95755383-0eaa-4859-bfe8-6e3fd2a374aa',
-    '2e974aa9-3836-4432-9152-8fc2d59bbc71',
-    'db7bb43f-c75e-4527-bcd0-5b42615cbc80',
-    '7822e461-5603-4ab3-a188-0b2a491504eb',
-    '74f8996d-598e-4b65-a7b8-872f406bf037',
-    '95755383-0eaa-4859-bfe8-6e3fd2a374a'
+bq_get_maquinas <- function(){
+  query <- "
+  SELECT 
+    distinct id_maquina 
+  from `prodVendu.assignments` 
+  where fecha > date_sub(current_date(), INTERVAL 15 DAY)"
+  
+  ids_df <- bigrquery::bq_project_query(
+    x = 'vendu-tech',
+    query = query
+  ) %>% 
+    bigrquery::bq_table_download()
+  
+  maqs_puntov <- c('GVRC004_VENDU1','GVRC004_VENDU2', 'MERC1')
+  maqs_epay <- ids_df %>% filter(!id_maquina %in% maqs_puntov) %>% pull(id_maquina)
+  
+  maqs_list <- list(
+    puntov = maqs_puntov,
+    epay = maqs_epay
   )
-)
+  
+  return(maqs_list)
+  
+}
+
+bq_get_last_sale <- function(dataset){
+  query <- glue::glue("SELECT max(fecha) as lastSaleAt from `{dataset}.odsSales`")
+  
+  bigrquery::bq_project_query(
+    x = 'vendu-tech',
+    query = query
+  ) %>% 
+    bigrquery::bq_table_download()
+}
+
+# Maquinas List
+# maquinas_list <- list(
+#   puntov = list(
+#     'GVRC004_VENDU1', 
+#     'GVRC004_VENDU2', 
+#     'MERC1'
+#   ),
+#   epay = list(
+#     '6edeae11-a06d-4dd7-b766-75257b55a1d8', 
+#     '52b69d4d-864f-4641-8be6-80a6438cb34e',
+#     'a70e5131-3f79-4773-b064-681f5afd407b', 
+#     '7b5dac83-116b-43f2-b98a-706b5112b4c3',
+#     '7f0a2baa-b739-4c0c-bddd-23bc8d10da94',
+#     '348952bc-590d-4f4b-984f-ed4c210a1436',
+#     '6c193483-84c3-467b-ab39-1c217ffe7a87',
+#     '0fb541ae-f56d-48bf-8fd9-4279667a4799', 
+#     'b8a894d0-64bf-4cd0-9f90-c874936d9d19', 
+#     '04e71197-83f5-41e7-89d8-deb10aa3905e',
+#     '96374528-7ecb-46fa-8e8a-6d1c9aac0399',
+#     '98102415-cd5d-4db6-ab5b-001b8bb1341b',
+#     '920dd6f8-9833-457c-b32d-53d11d1ebec3', 
+#     'b5fd0924-afa6-490a-a458-dab1c888a104',
+#     'e07d26b2-2f8c-4225-802f-26cfbd39948b',
+#     'b7aa53ea-5938-4b51-80d0-c8c49973393e', 
+#     'ka4d7fd39-afaf-4a59-8659-b192675e64e3',
+#     'f3d84ff8-57b5-4ba0-8a87-6b3cdb93b07f',
+#     'k106f56eb-3146-45bc-b9ab-d875a59a896e',
+#     '95755383-0eaa-4859-bfe8-6e3fd2a374aax',
+#     '95755383-0eaa-4859-bfe8-6e3fd2a374aa',
+#     '2e974aa9-3836-4432-9152-8fc2d59bbc71',
+#     'db7bb43f-c75e-4527-bcd0-5b42615cbc80',
+#     '7822e461-5603-4ab3-a188-0b2a491504eb',
+#     '74f8996d-598e-4b65-a7b8-872f406bf037',
+#     '95755383-0eaa-4859-bfe8-6e3fd2a374a'
+#   )
+# )
 
 field_map <- list(
   puntov = list(
