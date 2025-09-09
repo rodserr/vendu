@@ -59,7 +59,7 @@ ventas %>%
 
 # GET stores
 cat('Starting store ETL\n')
-almacen <- glue::glue('https://epay.uno/api/?e=prods&id={maquinas[[1]]}') %>% 
+almacen <- glue::glue('https://epay.uno/api/?e=prods&id={maquinas[[10]]}') %>% 
   httr2::request() %>%
   httr2::req_perform() %>% 
   httr2::resp_body_json() %>% 
