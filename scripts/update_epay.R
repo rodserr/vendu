@@ -59,15 +59,27 @@ ventas %>%
 
 # GET stores
 cat('Starting store ETL\n')
-almacen <- glue::glue('https://epay.uno/api/?e=prods&id={maquinas[[10]]}') %>% 
-  httr2::request() %>%
-  httr2::req_perform() %>% 
-  httr2::resp_body_json() %>% 
-  clean_response(
-    .fecha_consulta = current_time_locale,
-    .numeric_fields = field_map$epay$numeric,
-    .integer_fields = c(field_map$epay$integer, 'codigo')
-  )
+no_data_in_almacen <- T
+consulted_maqs <- 0
+i <- 1
+while(no_data_in_almacen | consulted_maqs >= length(maquinas)){
+  
+  maq_almacen <- maquinas[[i]]
+  almacen <- glue::glue('https://epay.uno/api/?e=prods&id={maq_almacen}') %>% 
+    httr2::request() %>%
+    httr2::req_perform() %>% 
+    httr2::resp_body_json() %>% 
+    clean_response(
+      .fecha_consulta = current_time_locale,
+      .numeric_fields = field_map$epay$numeric,
+      .integer_fields = c(field_map$epay$integer, 'codigo')
+    )
+  
+  no_data_in_almacen <- nrow(almacen) == 0
+  consulted_maqs <- consulted_maqs + 1
+  cat('Maquina Almacen Query: ', i, '\n')
+  
+}
 
 almacen %>%
   write_vendu_table(
