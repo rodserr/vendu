@@ -60,9 +60,8 @@ ventas %>%
 # GET stores
 cat('Starting store ETL\n')
 no_data_in_almacen <- T
-consulted_maqs <- 0
-i <- 1
-while(no_data_in_almacen | consulted_maqs >= length(maquinas)){
+i <- 1L
+while(no_data_in_almacen | i <= length(maquinas)){
   
   maq_almacen <- maquinas[[i]]
   almacen <- glue::glue('https://epay.uno/api/?e=prods&id={maq_almacen}') %>% 
@@ -76,7 +75,7 @@ while(no_data_in_almacen | consulted_maqs >= length(maquinas)){
     )
   
   no_data_in_almacen <- nrow(almacen) == 0
-  consulted_maqs <- consulted_maqs + 1
+  i <- i + 1L
   cat('Maquina Almacen Query: ', i, '\n')
   
 }
