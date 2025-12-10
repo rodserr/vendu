@@ -44,7 +44,7 @@ cat('Size of Table: ', object.size(today_sales)/1000, '\n')
 # Send email
 print('Sending Email')
 .to <- c('carlos@tuvendu.com', 'miguel@tuvendu.com', 'alessandro@tuvendu.com', 'juan@tuvendu.com',
-         'ventas@almete.com')
+         'ventas@almete.com', 'angelomorillo281828@gmail.com')
 .from <- Sys.getenv('GMAIL_ACCOUNT')
 cat('from:', .from, '\n')
 tryCatch({

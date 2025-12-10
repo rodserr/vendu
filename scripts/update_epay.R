@@ -59,33 +59,39 @@ ventas %>%
 
 # GET stores
 cat('Starting store ETL\n')
-no_data_in_almacen <- T
-i <- 1L
-while(no_data_in_almacen | i <= length(maquinas)){
+for(i in 1:length(maquinas) ){
+  
+  cat('Maquina Almacen Query: ', i, '\n')
   
   maq_almacen <- maquinas[[i]]
-  almacen <- glue::glue('https://epay.uno/api/?e=prods&id={maq_almacen}') %>% 
+  almacen_resp <- glue::glue('https://epay.uno/api/?e=prods&id={maq_almacen}') %>% 
     httr2::request() %>%
     httr2::req_perform() %>% 
-    httr2::resp_body_json() %>% 
+    httr2::resp_body_json()
+  
+  almacen <- almacen_resp %>% 
     clean_response(
       .fecha_consulta = current_time_locale,
       .numeric_fields = field_map$epay$numeric,
       .integer_fields = c(field_map$epay$integer, 'codigo')
     )
   
-  no_data_in_almacen <- nrow(almacen) == 0
-  i <- i + 1L
-  cat('Maquina Almacen Query: ', i, '\n')
+  if(nrow(almacen) > 0){
+    cat('Good response, breaking loop \n')
+    break
+  }
   
 }
 
-almacen %>%
-  write_vendu_table(
-    dataset = 'epay',
-    table = 'odsStore',
-    write_disposition = 'WRITE_TRUNCATE'
-  )
+if(nrow(almacen) > 0){
+  almacen %>%
+    write_vendu_table(
+      dataset = 'epay',
+      table = 'odsStore',
+      write_disposition = 'WRITE_TRUNCATE'
+    )
+}
+
 
 # GET Machine slot positions
 cat('Starting positions ETL\n')
