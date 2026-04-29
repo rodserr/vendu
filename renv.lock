@@ -225,18 +225,18 @@
     },
     "cli": {
       "Package": "cli",
-      "Version": "3.6.3",
+      "Version": "3.6.6",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
         "R",
         "utils"
       ],
-      "Hash": "b21916dd77a27642b447374a5d30ecf3"
+      "Hash": "a73d822b669d443ff8de6928f9c49850"
     },
     "clock": {
       "Package": "clock",
-      "Version": "0.7.0",
+      "Version": "0.7.4",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -248,7 +248,7 @@
         "tzdb",
         "vctrs"
       ],
-      "Hash": "3d8a84cdf9f6f8564531c49b70f3833d"
+      "Hash": "dce6a8b20db8fc2fe9967d85f770b475"
     },
     "commonmark": {
       "Package": "commonmark",
